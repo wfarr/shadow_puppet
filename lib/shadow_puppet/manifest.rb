@@ -365,10 +365,11 @@ module ShadowPuppet
     def new_resource(type, name, params = {})
       unless obj = @puppet_resources[type][name]
         obj = Puppet::Parser::Resource.new(
-          :title => name,
-          :type => type.name,
-          :source => self,
-          :scope => scope
+          name, type.name,
+          {
+            :source => self,
+            :scope => scope
+          }
         )
         @puppet_resources[type][name] = obj
       end
