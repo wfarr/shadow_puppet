@@ -344,14 +344,13 @@ module ShadowPuppet
         # Set the code to something innocuous; we just need the
         # scopes, not the interpreter.  Hackish, but true.
         Puppet[:code] = " "
-        @interp = Puppet::Parser::Interpreter.new
         require 'puppet/node'
         @node = Puppet::Node.new(Facter.value(:hostname))
         if env = Puppet[:environment] and env == ""
           env = nil
         end
         @node.parameters = Facter.to_hash
-        @compile = Puppet::Parser::Compiler.new(@node, @interp.send(:parser, env))
+        @compile = Puppet::Parser::Compiler.new(@node)
         @scope = @compile.topscope
       end
       @scope
