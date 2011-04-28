@@ -362,7 +362,8 @@ module ShadowPuppet
     def new_resource(type, name, params = {})
       unless obj = @puppet_resources[type][name]
         obj = Puppet::Parser::Resource.new(
-          name.gsub(/^\//, '').gsub(/\//, '::'), type.name,
+        # /^\w[-\w:.]*$/
+          name.gsub(/^\//, '').gsub(/\//, '::').gsub(/\@/, '').gsub(/( )+/, ' ').gsub(/\&\&/, '::').gsub(/ /, ''), type.name,
           {
             :source => self,
             :scope => scope
