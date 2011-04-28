@@ -208,7 +208,7 @@ module ShadowPuppet
         remove_method(type.name) rescue nil
         define_method(type.name) do |*args|
           if args && args.flatten.size == 1
-            reference(type.name, args.first)
+            reference(type, args.first)
           else
             new_resource(type, args.first, args.last)
           end
@@ -354,8 +354,40 @@ module ShadowPuppet
     end
 
     # Create a reference to another Puppet Resource.
-    def reference(type, title)
-      Puppet::Parser::Resource::Reference.new(type, title.to_s)
+    def reference(type, name, params = {})
+      unless obj = @puppet_resources[type][name]
+        obj = Puppet::Parser::Resource::Reference.new(
+          name.gsub(/^\//, '').gsub(/\//, '::').gsub(/\@/, '').gsub(/( )+/, ' ').gsub(/\&\&/, '::').gsub(/ /, ''), type.name,
+          {}
+        )
+      
+        @puppet_resources[type][name] = obj
+      end
+
+      case type.name
+      when :exec
+        param = Puppet::Parser::Resource::Param.new(
+          :name => 'path',
+          :value => ENV["PATH"]
+        )
+        obj.send(:set_parameter, param)
+        obj.class.define_method(:path) do
+          self.parameters[:path].value
+        end
+      end
+
+      params.each do |param_name, param_value|
+        param = Puppet::Parser::Resource::Param.new(
+          :name => param_name,
+          :value => param_value
+        )
+        obj.send(:set_parameter, param)
+        obj.class.define_method(param_name.to_sym) do
+          self.parameters[param_name.to_sym].value
+        end
+      end
+
+      obj
     end
 
     # Creates a new Puppet Resource.
