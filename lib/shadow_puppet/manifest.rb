@@ -374,11 +374,14 @@ module ShadowPuppet
       case type.name
       when :exec
         param = Puppet::Parser::Resource::Param.new(
-          :name => :path,
+          :name => 'path',
           :value => ENV["PATH"],
           :source => self
         )
         obj.send(:set_parameter, param)
+        obj.class.define_method(:path) do
+          self.parameters[:path].value
+        end
       end
 
       params.each do |param_name, param_value|
@@ -388,6 +391,9 @@ module ShadowPuppet
           :source => self
         )
         obj.send(:set_parameter, param)
+        obj.class.define_method(param_name.to_sym) do
+          self.parameters[param_name.to_sym].value
+        end
       end
 
       obj
