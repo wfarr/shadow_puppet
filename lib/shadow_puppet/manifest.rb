@@ -346,9 +346,6 @@ module ShadowPuppet
         Puppet[:code] = " "
         require 'puppet/node'
         @node = Puppet::Node.new(Facter.value(:hostname))
-        if env = Puppet[:environment] and env == ""
-          env = nil
-        end
         @node.parameters = Facter.to_hash
         @compile = Puppet::Parser::Compiler.new(@node)
         @scope = @compile.topscope
