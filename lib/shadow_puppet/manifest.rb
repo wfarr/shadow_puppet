@@ -355,7 +355,7 @@ module ShadowPuppet
 
     # Create a reference to another Puppet Resource.
     def reference(type, title)
-      Puppet::Parser::Resource::Reference.new(:type => type.to_s, :title => title.to_s, :scope => scope)
+      Puppet::Parser::Resource::Reference.new(type, title.to_s)
     end
 
     # Creates a new Puppet Resource.
