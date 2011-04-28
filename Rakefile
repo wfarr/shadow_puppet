@@ -12,7 +12,7 @@ Jeweler::Tasks.new do |gem|
 
   gem.version = "0.5.0b1"
 
-  gem.add_dependency('puppet', ["= 0.26.8"])
+  gem.add_dependency('puppet', ["= 2.6.8"])
   gem.add_dependency('facter', [">= 1.5.8"])
   gem.add_dependency('highline', [">= 1.5.0"])
   gem.add_dependency('builder', [">= 2.1.2"])
