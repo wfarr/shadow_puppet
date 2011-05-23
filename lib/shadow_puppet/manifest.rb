@@ -395,7 +395,7 @@ module ShadowPuppet
       unless obj = @puppet_resources[type][name]
         obj = Puppet::Parser::Resource.new(
         # /^\w[-\w:.]*$/
-          name.gsub(/^\//, '').gsub(/\//, '::').gsub(/\@/, '').gsub(/( )+/, ' ').gsub(/\&\&/, '::').gsub(/ /, ''), type.name,
+          name.gsub(/^\//, '').gsub(/\//, '::').gsub(/\@/, '').gsub(/( )+/, ' ').gsub(/\&\&/, '::').gsub(/ /, '').gsub(/\./, '_dot_'), type.name,
           {
             :source => self,
             :scope => scope
