@@ -355,52 +355,51 @@ module ShadowPuppet
 
     # Create a reference to another Puppet Resource.
     def reference(type, name, params = {})
-      unless obj = @puppet_resources[type][name]
-        obj = Puppet::Parser::Resource::Reference.new(
-          type.name, name,
-          {}
-        )
+      unless type.name == :file
+
+        unless obj = @puppet_resources[type][name]
+          obj = Puppet::Parser::Resource::Reference.new(
+            type.name, name,
+            {}
+          )
       
-        @puppet_resources[type][name] = obj
-      end
-
-      case type.name
-      when :exec
-        param = Puppet::Parser::Resource::Param.new(
-          :name => :path,
-          :value => ENV["PATH"]
-        )
-        obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
-        obj.class.define_method(:path) do
-          self.parameters[:path].value
+          @puppet_resources[type][name] = obj
         end
-      end
 
-      params.each do |param_name, param_value|
-        next if (param_name == :require || param_name == :before) && param_value !~ /\w+\[\w+\]/
-        param = Puppet::Parser::Resource::Param.new(
-          :name => param_name,
-          :value => param_value.to_s
-        )
-        obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
-      end
+        case type.name
+        when :exec
+          param = Puppet::Parser::Resource::Param.new(
+            :name => :path,
+            :value => ENV["PATH"]
+          )
+          obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
+          obj.class.define_method(:path) do
+            self.parameters[:path].value
+          end
+        end
 
-      obj
+        params.each do |param_name, param_value|
+          param = Puppet::Parser::Resource::Param.new(
+            :name => param_name,
+            :value => param_value.to_s
+          )
+          obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
+        end
+
+        obj
+      end
     end
 
     # Creates a new Puppet Resource.
     def new_resource(type, name, params = {})
-      unless obj = @puppet_resources[type][name]
-        obj = Puppet::Parser::Resource.new(
-        # /^\w[-\w:.]*$/
-          type.name, name,
-          {
-            :source => self,
-            :scope => scope
-          }
-        )
-        @puppet_resources[type][name] = obj
-      #end
+      obj = Puppet::Parser::Resource.new(
+        type.name, name,
+        {
+          :source => self,
+          :scope => scope
+        }
+      )
+      @puppet_resources[type][name] = obj
 
       case type.name
       when :exec
@@ -416,7 +415,6 @@ module ShadowPuppet
       end
 
       params.each do |param_name, param_value|
-        next if (param_name == :require || param_name == :before) && param_value !~ /\w+\[\w+\]/
         param = Puppet::Parser::Resource::Param.new(
           :name => param_name,
           :value => param_value.to_s,
