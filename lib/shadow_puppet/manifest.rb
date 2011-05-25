@@ -367,7 +367,7 @@ module ShadowPuppet
       case type.name
       when :exec
         param = Puppet::Parser::Resource::Param.new(
-          :name => 'path',
+          :name => :path,
           :value => ENV["PATH"]
         )
         obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
@@ -404,7 +404,7 @@ module ShadowPuppet
       case type.name
       when :exec
         param = Puppet::Parser::Resource::Param.new(
-          :name => 'path',
+          :name => :path,
           :value => ENV["PATH"],
           :source => self
         )
