@@ -357,7 +357,7 @@ module ShadowPuppet
     def reference(type, name, params = {})
       unless obj = @puppet_resources[type][name]
         obj = Puppet::Parser::Resource::Reference.new(
-          name.gsub(/^\//, '').gsub(/\//, '::').gsub(/\@/, '').gsub(/( )+/, ' ').gsub(/\&\&/, '::').gsub(/ /, ''), type.name,
+          type.name, name,
           {}
         )
       
@@ -382,9 +382,6 @@ module ShadowPuppet
           :value => param_value
         )
         obj.send(:set_parameter, param)
-        obj.class.define_method(param_name.to_sym) do
-          self.parameters[param_name.to_sym].value
-        end
       end
 
       obj
@@ -395,7 +392,7 @@ module ShadowPuppet
       unless obj = @puppet_resources[type][name]
         obj = Puppet::Parser::Resource.new(
         # /^\w[-\w:.]*$/
-          name.gsub(/^\//, '').gsub(/\//, '::').gsub(/\@/, '').gsub(/( )+/, ' ').gsub(/\&\&/, '::').gsub(/ /, '').gsub(/\./, '_dot_'), type.name,
+          type.name, name,
           {
             :source => self,
             :scope => scope
@@ -424,9 +421,6 @@ module ShadowPuppet
           :source => self
         )
         obj.send(:set_parameter, param)
-        obj.class.define_method(param_name.to_sym) do
-          self.parameters[param_name.to_sym].value
-        end
       end
 
       obj
