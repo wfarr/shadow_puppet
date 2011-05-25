@@ -240,5 +240,25 @@ describe "A manifest" do
      end
 
    end
+
+  describe "when dependency test manifest" do
+    before(:each) do
+      @manifest = DependencyTestManifest.new
+    end
+
+    it "include directories recipe" do
+      @manifest.class.recipes.map(&:first).should include(:bar)
+    end
+
+    it "calls specified methods" do
+      @manifest.should_receive(:bar)
+      @manifest.send(:evaluate_recipes)
+    end
+
+    it "returns true when executed" do
+      debugger
+      @manifest.execute.should be_true
+    end
+  end
   
 end

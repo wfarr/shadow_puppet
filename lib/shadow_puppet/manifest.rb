@@ -377,9 +377,10 @@ module ShadowPuppet
       end
 
       params.each do |param_name, param_value|
+        next if (param_name == :require || param_name == :before) && param_value !~ /\w+\[\w+\]/
         param = Puppet::Parser::Resource::Param.new(
           :name => param_name,
-          :value => param_value
+          :value => param_value.to_s
         )
         obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
       end
@@ -399,7 +400,7 @@ module ShadowPuppet
           }
         )
         @puppet_resources[type][name] = obj
-      end
+      #end
 
       case type.name
       when :exec
@@ -415,9 +416,10 @@ module ShadowPuppet
       end
 
       params.each do |param_name, param_value|
+        next if (param_name == :require || param_name == :before) && param_value !~ /\w+\[\w+\]/
         param = Puppet::Parser::Resource::Param.new(
           :name => param_name,
-          :value => param_value,
+          :value => param_value.to_s,
           :source => self
         )
         obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
