@@ -370,7 +370,7 @@ module ShadowPuppet
           :name => 'path',
           :value => ENV["PATH"]
         )
-        obj.send(:set_parameter, param)
+        obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
         obj.class.define_method(:path) do
           self.parameters[:path].value
         end
@@ -381,7 +381,7 @@ module ShadowPuppet
           :name => param_name,
           :value => param_value
         )
-        obj.send(:set_parameter, param)
+        obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
       end
 
       obj
@@ -408,7 +408,7 @@ module ShadowPuppet
           :value => ENV["PATH"],
           :source => self
         )
-        obj.send(:set_parameter, param)
+        obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
         obj.class.define_method(:path) do
           self.parameters[:path].value
         end
@@ -420,7 +420,7 @@ module ShadowPuppet
           :value => param_value,
           :source => self
         )
-        obj.send(:set_parameter, param)
+        obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
       end
 
       obj
