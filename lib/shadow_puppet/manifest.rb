@@ -366,25 +366,31 @@ module ShadowPuppet
           @puppet_resources[type][name] = obj
         end
 
-        case type.name
-        when :exec
-          param = Puppet::Parser::Resource::Param.new(
-            :name => :path,
-            :value => ENV["PATH"]
-          )
-          obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
-          obj.class.define_method(:path) do
-            self.parameters[:path].value
-          end
-        end
+        #case type.name
+        #when :exec
+        #  param = Puppet::Parser::Resource::Param.new(
+        #    :name => :path,
+        #    :value => ENV["PATH"]
+        #  )
+         # obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
+         # obj.class.define_method(:path) do
+        #    self.parameters[:path].value
+        #  end
+        #end
 
-        params.each do |param_name, param_value|
-          param = Puppet::Parser::Resource::Param.new(
-            :name => param_name,
-            :value => param_value.to_s
-          )
-          obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
-        end
+        #params.each do |param_name, param_value|
+        #  if param_value
+            #if param_value.respond_to?(:join)
+            #  param_value = "[#{param_value.join(',')}]"
+            #end
+
+        #    param = Puppet::Parser::Resource::Param.new(
+        #      :name => param_name,
+        #      :value => param_value
+        #    )
+        #    obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
+        #  end
+        #end
 
         obj
       end
@@ -415,12 +421,21 @@ module ShadowPuppet
       end
 
       params.each do |param_name, param_value|
-        param = Puppet::Parser::Resource::Param.new(
-          :name => param_name,
-          :value => param_value.to_s,
-          :source => self
-        )
-        obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
+        unless param_name == :alias
+          if param_value
+            #if param_value.respond_to?(:join)
+            #  param_value = "[#{param_value.join(',')}]"
+            #end
+
+
+            param = Puppet::Parser::Resource::Param.new(
+              :name => param_name,
+              :value => param_value,
+              :source => self
+            )
+            obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
+          end
+        end
       end
 
       obj

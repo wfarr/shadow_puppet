@@ -142,9 +142,11 @@ class TestHelpers < ShadowPuppet::Manifest
 end
 
 class DependencyTestManifest < ShadowPuppet::Manifest
-  def bar
+  def test
     exec('foobar', :command => 'true', :before => exec('barbaz'))
-    exec('barbaz', :command => 'true', :require => exec('foobar'))
+    exec('trololol', :command => 'true')
+    exec('barbaz', :command => 'true', :require => [exec('foobar'), exec('trololol')])
+    
   end
-  recipe :bar
+  recipe :test
 end
