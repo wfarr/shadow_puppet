@@ -75,7 +75,7 @@ module ShadowPuppet
 
     class_inheritable_accessor :recipes
     write_inheritable_attribute(:recipes, [])
-    attr_reader :puppet_resources
+    attr_reader :puppet_resources, :scope, :node, :compile
     class_inheritable_accessor :__config__
     write_inheritable_attribute(:__config__, Hash.new)
 
@@ -356,90 +356,48 @@ module ShadowPuppet
     # Create a reference to another Puppet Resource.
     def reference(type, name, params = {})
       unless type.name == :file
-
-        unless obj = @puppet_resources[type][name]
-          obj = Puppet::Parser::Resource::Reference.new(
-            type.name, name,
-            {}
-          )
-      
-          @puppet_resources[type][name] = obj
-        end
-
-        #case type.name
-        #when :exec
-        #  param = Puppet::Parser::Resource::Param.new(
-        #    :name => :path,
-        #    :value => ENV["PATH"]
-        #  )
-         # obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
-         # obj.class.define_method(:path) do
-        #    self.parameters[:path].value
-        #  end
-        #end
-
-        #params.each do |param_name, param_value|
-        #  if param_value
-            #if param_value.respond_to?(:join)
-            #  param_value = "[#{param_value.join(',')}]"
-            #end
-
-        #    param = Puppet::Parser::Resource::Param.new(
-        #      :name => param_name,
-        #      :value => param_value
-        #    )
-        #    obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
-        #  end
-        #end
-
-        obj
+        Puppet::Parser::Resource::Reference.new(type.name.to_s.capitalize, name.to_s)
       end
     end
 
     # Creates a new Puppet Resource.
     def new_resource(type, name, params = {})
-      obj = Puppet::Parser::Resource.new(
-        type.name, name,
-        {
-          :source => self,
-          :scope => scope
-        }
+      @puppet_resources[type][name] ||= obj = (
+        @puppet_resources[type][name] ||
+        Puppet::Parser::Resource.new(type.name, name, :source => self, :scope => scope)
       )
-      @puppet_resources[type][name] = obj
 
       case type.name
       when :exec
-        param = Puppet::Parser::Resource::Param.new(
-          :name => :path,
-          :value => ENV["PATH"],
-          :source => self
-        )
-        obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
-        obj.class.define_method(:path) do
-          self.parameters[:path].value
-        end
+        params[:path] = ENV['PATH']
       end
 
-      params.each do |param_name, param_value|
-        unless param_name == :alias
-          if param_value
-            #if param_value.respond_to?(:join)
-            #  param_value = "[#{param_value.join(',')}]"
-            #end
+      params.each do |pname, pval|
+        pval = pval.is_a?(Array) ? pval.join(',').split(',') : pval.to_s
 
-
-            param = Puppet::Parser::Resource::Param.new(
-              :name => param_name,
-              :value => param_value,
-              :source => self
-            )
-            obj.send(:set_parameter, param) if obj.respond_to?(:set_parameter)
+        unless pval.empty?
+          param = Puppet::Parser::Resource::Param.new(
+            :name => convert(pname),
+            :value => pval,
+            :source => self
+          )
+          obj.send(:set_parameter, param) unless obj.nil?
+          obj.class.define_method(:pname) do
+            self.parameters[:pname].value
           end
         end
       end
 
       obj
     end
-
+    
+    def convert(value)
+      if value == ''
+        # We can't intern an empty string, yay.
+        value
+      else
+        value.to_s.to_sym
+      end
+    end
   end
 end

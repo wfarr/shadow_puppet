@@ -144,8 +144,8 @@ end
 class DependencyTestManifest < ShadowPuppet::Manifest
   def test
     exec('foobar', :command => 'true', :before => exec('barbaz'))
-    exec('trololol', :command => 'true')
-    exec('barbaz', :command => 'true', :require => [exec('foobar'), exec('trololol')])
+    exec('trololol', :command => 'true', :alias => "winning")
+    exec('barbaz', :command => 'true', :require => [exec('foobar'), exec('winning')])
     
   end
   recipe :test
